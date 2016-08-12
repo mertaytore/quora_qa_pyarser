@@ -1,2 +1,2 @@
-# scrapyprogress
-Progress repo on crawling and stuff.
+# quora_qa_parser
+Progress repo for Quora Q & A crawling
