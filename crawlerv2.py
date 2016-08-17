@@ -11,7 +11,7 @@ except ImportError:
 from tornado import httpclient, gen, ioloop, queues
 
 concurrency = 10
-base_url = 'https://www.quora.com/Why-is-SV-Angel-being-so-indecisive'
+base_url = 'https://www.quora.com/How-clean-is-a-hospital-floor'
 
 
 @gen.coroutine
@@ -55,7 +55,7 @@ def get_links(html):
 @gen.coroutine
 def main():
 
-    file = open("test2.txt", 'w')
+    file = open("test3.txt", 'w') # mode a for last line
     q = queues.Queue()
     start = time.time()
     fetching, fetched = set(), set()
@@ -69,7 +69,7 @@ def main():
 
             print('fetching %s' % current_url)
             fetching.add(current_url)
-            if '/answ' in current_url:
+            if ('/answ' in current_url) and not('/profile/' in current_url):
                 current_url, unwanted = current_url.split('/ans')
                 file.write(current_url + '\n')
             urls = yield get_links_from_url(current_url)
