@@ -1,22 +1,15 @@
 from processv2 import QuoraParser
 import csv, sys, random
-
+import importlib
 parser = QuoraParser()
 
-'''lines_seen = set() # holds lines already seen
-outfile = open("newtest3.txt", "a")
-for line in open("test3.txt", "r"):
-    if line not in lines_seen: # not a duplicate
-        outfile.write(line)
-        lines_seen.add(line)
-outfile.close()'''
-
 def create_train_csv():
+    print('enter train')
     count = 0
     outfile = open("newtest3train.txt", "r")
     csvfile = open('train.csv', 'a')
     datawriter = csv.writer(csvfile)
-    datawriter.writerow(["Context","Utterance","Label"])
+    #datawriter.writerow(["Context","Utterance","Label"])
 
     for line in outfile:
         count = count + 1
@@ -33,21 +26,32 @@ def create_train_csv():
             datawriter.writerow(row)
         print(str(count) + 'train.csv')
     outfile.close()
+    print('exit train')
+
 def create_valid_csv():
     count = 0
     length = 0
     outfile = open("newtest3valid.txt", "r")
+    distractorfile =  open("outnewtest3.txt", "r")
     csvfile = open('valid.csv', 'a')
     datawriter = csv.writer(csvfile)
     datawriter.writerow(["Context","Ground Truth Utterance","Distractor_0","Distractor_1","Distractor_2","Distractor_3","Distractor_4","Distractor_5","Distractor_6","Distractor_7","Distractor_8"])
+    rand_num = 0
 
     for line in outfile:
         count = count + 1
         q, gtu = parser.get_data(line)
+
         while (length < 9):
-            random_distractor = all_answers[random.randrange(0, answer_length)][0]
+            rand_num = random.randrange(0, answer_length)
+            #initialize random_distractor
+            for i in range(answer_length):
+                random_distractor = distractorfile.readline()
+                if i == rand_num:
+                    break
             d0 = random_distractor.split(".")
             length = len(d0)
+
         for i in range(9):
             if not '__eou__' in d0[i]:
                 d0[i] += " __eou__"
@@ -75,12 +79,14 @@ def create_valid_csv():
         print(str(count) + 'valid.csv')
         length = 0
     outfile.close()
+    distractorfile.close()
 
 def create_test_csv():
     count = 0
     length = 0
     outfile = open("newtest3.txt", "r")
     csvfile = open('test.csv', 'a')
+    distractorfile =  open("outnewtest3.txt", "r")
     datawriter = csv.writer(csvfile)
     datawriter.writerow(["Context","Ground Truth Utterance","Distractor_0","Distractor_1","Distractor_2","Distractor_3","Distractor_4","Distractor_5","Distractor_6","Distractor_7","Distractor_8"])
 
@@ -88,7 +94,12 @@ def create_test_csv():
         count = count + 1
         q, gtu = parser.get_data(line)
         while (length < 9):
-            random_distractor = all_answers[random.randrange(0, answer_length)][0]
+            rand_num = random.randrange(0, answer_length)
+            #initialize random_distractor
+            for i in range(answer_length):
+                random_distractor = distractorfile.readline()
+                if i == rand_num:
+                    break
             d0 = random_distractor.split(".")
             length = len(d0)
         for i in range(9):
@@ -118,15 +129,14 @@ def create_test_csv():
         print(str(count) + 'test.csv')
         length = 0
     outfile.close()
+    distractorfile.close()
 
 
-all_answers = []
-outfile = open("newtest3.txt", "r")
-for line in outfile:
-    q, a = parser.get_data(line)
-    all_answers.append(a)
-answer_length = len(all_answers)
 
+answer_length = 4750
+importlib.reload(sys)
+print('before train')
 create_train_csv()
+print('after train')
 create_valid_csv()
 create_test_csv()

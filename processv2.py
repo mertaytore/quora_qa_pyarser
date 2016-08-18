@@ -1,7 +1,8 @@
 import urllib.request
-import re
+import re, sys
 import unicodedata
 from html.parser import HTMLParser
+
 
 class QuoraParser(HTMLParser):
     def __init__(self):
