@@ -1,2 +1,2 @@
 # quora_qa_parser
-Progress repo for Quora Q & A crawling
+Extracting question-answer pairs from a particular question in Quora, with parsing HTML tags.

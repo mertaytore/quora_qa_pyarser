@@ -11,14 +11,15 @@ except ImportError:
 from tornado import httpclient, gen, ioloop, queues
 
 concurrency = 10
-base_url = 'https://www.quora.com/How-clean-is-a-hospital-floor'
 
+# base url is given as an input when running the program
+base_url = sys.argv[1]
 
 @gen.coroutine
 def get_links_from_url(url):
     try:
         response = yield httpclient.AsyncHTTPClient().fetch(url)
-        print('fetched %s' % url)
+        print(url)
 
         html = response.body if isinstance(response.body, str) \
             else response.body.decode()
@@ -51,11 +52,13 @@ def get_links(html):
     url_seeker.feed(html)
     return url_seeker.urls
 
+def is_ascii(s):
+    return all(ord(c) < 128 for c in s)
 
 @gen.coroutine
 def main():
 
-    file = open("test3.txt", 'w') # mode a for last line
+    file = open("raw_extracted.txt", 'a') # mode a for last line
     q = queues.Queue()
     start = time.time()
     fetching, fetched = set(), set()
@@ -66,20 +69,18 @@ def main():
         try:
             if current_url in fetching:
                 return
-
-            print('fetching %s' % current_url)
-            fetching.add(current_url)
-            if ('/answ' in current_url) and not('/profile/' in current_url):
-                current_url, unwanted = current_url.split('/ans')
-                file.write(current_url + '\n')
-            urls = yield get_links_from_url(current_url)
-            fetched.add(current_url)
-
-            for new_url in urls:
-                #############
-                if new_url.startswith('https://www.quora.com/'):
-                    yield q.put(new_url)
-
+            if(is_ascii(current_url)):
+                fetching.add(current_url)
+                if ('/answ' in current_url) and not('/profile/' in current_url):
+                    current_url, unwanted = current_url.split('/ans')
+                    file.write(current_url + '\n')
+                    time.sleep(0.1)
+                urls = yield get_links_from_url(current_url)
+                if not('sitemap' in current_url):
+                    fetched.add(current_url)
+                    for new_url in urls:
+                        if new_url.startswith('https://www.quora.com/'):
+                            yield q.put(new_url)
         finally:
             q.task_done()
 
@@ -93,11 +94,9 @@ def main():
     #worker initialization
     for _ in range(concurrency):
         worker()
-    yield q.join(timeout=timedelta(seconds=300))
+    yield q.join(timeout=timedelta(seconds=180)) ## 3 minutes
     file.close()
     assert fetching == fetched
-    print('Done in %d seconds, fetched %s URLs.' % (
-        time.time() - start, len(fetched)))
 
 
 if __name__ == '__main__':
