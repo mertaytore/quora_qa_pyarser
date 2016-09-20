@@ -1,4 +1,4 @@
-# quora_qa_parser
+# quora_qa_pyarser
 Extracting question-answer pairs from a particular question in Quora, with parsing HTML tags.<br>
 extract.py -> does the parsing from page source code<br>
 sample_usage.py -> simply type the command the below for the output:
