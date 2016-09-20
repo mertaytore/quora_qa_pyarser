@@ -79,16 +79,10 @@ class QuoraParser(HTMLParser):
                 break
         parser.dataArray = parser.dataArray[:index]
 
-        # Leaving answer empty if there is no answer
-        if not parser.dataArray == []:
-            parser.dataArray.append('__eou__')
-
         for data in parser.dataArray:
             answer_string += str(data) + ' '
         answer.append(answer_string)
 
-        # Formatting question
-        parser.question += '__eou__ __eot__'
         question.append(parser.question)
 
         return question, answer
