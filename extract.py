@@ -4,6 +4,7 @@ import unicodedata
 from html.parser import HTMLParser
 
 
+
 class QuoraParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
@@ -15,6 +16,7 @@ class QuoraParser(HTMLParser):
         self.inSpan = False
         self.time = 0
 
+    # Running deeper in tags
     def handle_starttag(self, tag, attrs):
         if tag == 'title':
             self.lasttag = tag
@@ -39,7 +41,8 @@ class QuoraParser(HTMLParser):
                     self.inSpan = True
                     self.lasttag = tag
                     self.inData = True
-
+    
+    # Answer found under qtext_para tag
         if tag == 'p' and self.inData and self.time == 1:
             for name, value in attrs:
                 if name == 'class' and value == 'qtext_para':
@@ -50,6 +53,7 @@ class QuoraParser(HTMLParser):
         if self.lasttag == 'span' and self.inDiv:
             self.inSpan = False
 
+    # Stripping out unwanted bits of the data
     def handle_data(self, data):
         if (self.lasttag == 'p' or self.lasttag == 'br' or self.lasttag == 'li' or self.lasttag == 'b' or self.lasttag == 'ul' or self.lasttag == 'i') and self.inData and data.strip() and self.time == 1:
             data = data.replace(u'\xa0',u'')
