@@ -1,3 +1,5 @@
+![Build Status](https://travis-ci.org/mertaytore/quora_qa_pyarser.svg?branch=master)
+
 # quora_qa_pyarser
 
 Readme to be updated after the pipeline development.
